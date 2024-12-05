@@ -1,0 +1,19 @@
+{
+  "name": "mongodb-work2",
+  "version": "1.0.0",
+  "description": "to learn mongodb",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "author": "Arjun",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "mongoose": "^8.8.2"
+  }
+}
