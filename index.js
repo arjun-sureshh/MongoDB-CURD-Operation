@@ -1101,6 +1101,7 @@ app.post("/Complaint", async (req, res) => {
 
     }
 })
+// get complaint /.
 
 app.get("/Complaint", async (req, res) => {
     try {
@@ -1115,6 +1116,7 @@ app.get("/Complaint", async (req, res) => {
         res.send({ message: "server error" })
     }
 })
+
 
 
 
@@ -1136,7 +1138,6 @@ app.post("/ComplaintType", async (req, res) => {
 
         let comaplintType = new ComaplaintType({
             complaintTypeName,
-
         })
 
         await comaplintType.save();
@@ -1201,8 +1202,6 @@ const locationSchemaStructure = new mongoose.Schema({
         type: String,
         required: true,
     },
-
-
 })
 
 const Location = mongoose.model("location", locationSchemaStructure);
@@ -1216,7 +1215,6 @@ app.post("/Location", async (req, res) => {
             placeId,
             locationLangitude,
             locationLatitude
-
         })
 
         await location.save();
@@ -1229,8 +1227,61 @@ app.post("/Location", async (req, res) => {
     }
 })
 
+// .................  place with location group  .......................................
+
+
 app.get("/PlacewithLocation-Group", async (req,res) => {
-    
+ 
+    try {
+        
+        const placewithlocation = await Location.aggregate([
+            {
+                $lookup:{
+                    from:"places",
+                    localField:"placeId",
+                    foreignField:"_id",
+                    as:"places"
+                }
+            },
+            {
+                $unwind:"$places"
+            },
+            {
+                $group:{
+                    _id:"placeId",
+                    places:{ $first : "$places" },
+                    locations:{ $push : "$$ROOT" }
+                }
+            },
+            {
+                $project:{
+                    place:{
+                        placeName: "$places.placeName"
+                    },
+                    locations:{
+                        $map:{
+                          input:"$locations",
+                          as:"loc",
+                          in:{
+                            _id:"$$loc._id",
+                            locationName:"$$loc.locationName",
+                            locationLangitude:"$$loc.locationLangitude",
+                            locationLatitude:"$$loc.locationLatitude"
+                          }
+                        }
+                    }
+                }
+            }
+        ])
+
+        res.send(placewithlocation)
+
+    } catch (err) {
+        console.error(err);
+        
+        
+    }
+
 })
 
 //Mechanic collection 
